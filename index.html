@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meihua 4 Unit 4 - 外面在刮风呢 | bit.ly/lcnpalembang</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandYellow: '#FFD166',
+            brandPink: '#FF70A6',
+            brandSky: '#00A8E8',
+            brandGreen: '#06D6A0',
+            brandPurple: '#8338EC',
+            brandOrange: '#FB5607'
+          },
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            quicksand: ['Quicksand', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Standard SimSun Font for Hanzi readability */
+    .simsun-hanzi {
+      font-family: 'SimSun', 'NSimSun', 'Songti SC', 'STSong', '華康儷宋', serif !important;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 40%, #fef3c7 100%);
+      min-height: 100vh;
+      user-select: none;
+    }
+
+    /* Classroom Projection Font Scaling */
+    .classroom-large {
+      font-size: 1.18rem;
+    }
+    .classroom-large .simsun-hanzi {
+      font-size: 1.4em !important;
+    }
+
+    /* Animations */
+    @keyframes windFloat {
+      0%, 100% { transform: translateX(0px) rotate(0deg); }
+      50% { transform: translateX(12px) rotate(4deg); }
+    }
+    .animate-wind {
+      animation: windFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes starPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+    .animate-star-pulse {
+      animation: starPulse 1.5s ease-in-out infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #38bdf8;
+      border-radius: 10px;
+    }
+
+    /* Print styling for certificate */
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-modal, #certificate-modal * { visibility: visible; }
+      #certificate-modal { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body id="app-body" class="text-slate-800 pb-12 overflow-x-hidden">
+
+  <!-- Canvas Fireworks Confetti -->
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- TOP CLASSROOM BAR -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-4 border-sky-300 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Unit Title & Branding -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-md transform hover:rotate-6 transition">
+          🍃
+        </div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-600 block">MEIHUA 4 • UNIT 4 • bit.ly/lcnpalembang</span>
+          <h1 class="text-xl font-extrabold font-fredoka text-slate-800 flex items-center gap-2">
+            第四课 <span class="simsun-hanzi text-sky-700 text-2xl font-bold">外面在刮风呢</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Controls & Student Info -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <!-- Student Input -->
+        <div class="flex items-center bg-sky-50 border-2 border-sky-200 rounded-2xl px-3 py-1.5 shadow-inner">
+          <i class="fa-solid fa-user-graduate text-sky-500 mr-2"></i>
+          <input type="text" id="student-name-input" value="Siswa LCN Palembang" placeholder="Nama Siswa..." 
+                 class="bg-transparent font-bold text-sky-900 focus:outline-none text-xs sm:text-sm w-36 sm:w-44" oninput="updateStudentName(this.value)">
+        </div>
+
+        <!-- Star Counter -->
+        <div class="flex items-center bg-yellow-100 border-2 border-yellow-400 rounded-2xl px-3 py-1.5 shadow-sm">
+          <i class="fa-solid fa-star text-amber-500 text-lg mr-1.5 animate-star-pulse"></i>
+          <span id="star-count" class="font-fredoka font-bold text-base text-amber-900">0</span>
+        </div>
+
+        <!-- Classroom Presentation Mode Toggle -->
+        <button onclick="toggleClassroomMode()" id="btn-classroom-mode"
+                title="Perbesar Layar Depan Kelas"
+                class="bg-sky-100 border-2 border-sky-300 text-sky-800 text-xs font-bold px-3 py-2 rounded-2xl flex items-center gap-1.5 hover:bg-sky-200 transition shadow-sm">
+          <i class="fa-solid fa-expand"></i>
+          <span class="hidden sm:inline" id="class-mode-text">Tampilan Kelas</span>
+        </button>
+
+        <!-- Pinyin Switch -->
+        <button onclick="togglePinyinGlobal()" 
+                class="bg-emerald-100 border-2 border-emerald-300 text-emerald-800 text-xs font-bold px-3 py-2 rounded-2xl flex items-center gap-1.5 hover:bg-emerald-200 transition shadow-sm">
+          <i class="fa-solid fa-language"></i>
+          <span id="pinyin-status-text">Pinyin: ON</span>
+        </button>
+
+        <!-- Sound FX Switch -->
+        <button onclick="toggleSoundFX()" 
+                class="bg-purple-100 border-2 border-purple-300 text-purple-800 text-xs font-bold px-3 py-2 rounded-2xl flex items-center gap-1 hover:bg-purple-200 transition shadow-sm">
+          <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER (LEFT NAVIGATION SIDEBAR & RIGHT CONTENT) -->
+  <main class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
+
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-64 lg:w-72 shrink-0">
+      <div class="sticky top-20 bg-white/90 backdrop-blur-md p-4 rounded-3xl border-4 border-sky-200 shadow-md space-y-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-sky-600 px-3 block">Daftar Modul Unit 4</span>
+        
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn active w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-sky-500 text-white shadow-md">
+          <i class="fa-solid fa-house text-base sm:text-lg"></i>
+          <span>Beranda</span>
+        </button>
+        <button onclick="switchTab('modul1')" id="nav-modul1" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-shapes text-sky-500 text-base sm:text-lg"></i>
+          <span>1. 部首与生字 (Radikal 刂)</span>
+        </button>
+        <button onclick="switchTab('modul2')" id="nav-modul2" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-pen-field text-emerald-500 text-base sm:text-lg"></i>
+          <span>2. 词语填空 (Isi Kata)</span>
+        </button>
+        <button onclick="switchTab('modul3')" id="nav-modul3" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-hand text-pink-500 text-base sm:text-lg"></i>
+          <span>3. 别 / 不要 (Grammar Jangan)</span>
+        </button>
+        <button onclick="switchTab('modul4')" id="nav-modul4" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-cat text-purple-500 text-base sm:text-lg"></i>
+          <span>4. 阅读《小白不见了》</span>
+        </button>
+        <button onclick="switchTab('modul5')" id="nav-modul5" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-comments text-orange-500 text-base sm:text-lg"></i>
+          <span>5. 完成对话 (Percakapan)</span>
+        </button>
+        <button onclick="switchTab('certificate')" id="nav-certificate" class="tab-btn w-full text-left px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-3 transition bg-white text-slate-700 hover:bg-sky-100">
+          <i class="fa-solid fa-award text-yellow-500 text-base sm:text-lg"></i>
+          <span>6. Sertifikat Kelas</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <div class="flex-1 min-w-0 space-y-6">
+
+    <!-- ==================== 0. DASHBOARD ==================== -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 border-4 border-sky-200">
+        <div class="space-y-4 max-w-xl z-10">
+          <span class="bg-white/20 backdrop-blur-md text-white font-bold text-xs uppercase px-3 py-1 rounded-full inline-block border border-white/30">
+            Meihua 4 Workbook Unit 4 • bit.ly/lcnpalembang
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold font-fredoka leading-tight">
+            Aplikasi Belajar Mandarin Interaktif Unit 4 🍃
+          </h2>
+          <p class="text-sky-100 text-sm sm:text-base leading-relaxed">
+            Mari belajar radikal <span class="simsun-hanzi text-2xl font-bold text-white bg-black/20 px-2 py-0.5 rounded">刂</span> (立刀旁), kosakata cuaca & barang, larangan <span class="font-bold underline text-yellow-200">别 / 不要</span>, serta cerita seru pencarian kucing <span class="font-bold underline text-yellow-200">《小白不见了》</span>!
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="switchTab('modul1')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition flex items-center gap-2">
+              <i class="fa-solid fa-play text-sky-500"></i> Mulai Aktivitas Belajar
+            </button>
+          </div>
+        </div>
+
+        <!-- Animated Weather & Cat Mascot Graphic -->
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="w-44 h-44 sm:w-52 sm:h-52 relative animate-wind">
+            <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-2xl">
+              <!-- Wind Clouds -->
+              <path d="M 30 70 Q 50 40 80 50 Q 110 30 140 60 Q 170 50 170 80 Q 180 110 150 120 Q 130 130 100 120 Q 70 130 40 110 Q 20 90 30 70 Z" fill="#E0F2FE" opacity="0.95"/>
+              <!-- Swirl Lines -->
+              <path d="M 20 50 Q 60 30 100 50 Q 120 60 110 75" fill="none" stroke="#38BDF8" stroke-width="4" stroke-linecap="round"/>
+              <path d="M 40 140 Q 90 120 140 140 Q 160 150 155 160" fill="none" stroke="#0284C7" stroke-width="4" stroke-linecap="round"/>
+              <!-- Cute Cat Head (Xiaobai) -->
+              <circle cx="100" cy="115" r="32" fill="#FFFFFF" stroke="#94A3B8" stroke-width="3"/>
+              <!-- Cat Ears -->
+              <polygon points="73,95 82,72 94,90" fill="#FFFFFF" stroke="#94A3B8" stroke-width="3"/>
+              <polygon points="77,93 83,78 90,90" fill="#F472B6"/>
+              <polygon points="127,95 118,72 106,90" fill="#FFFFFF" stroke="#94A3B8" stroke-width="3"/>
+              <polygon points="123,93 117,78 110,90" fill="#F472B6"/>
+              <!-- Eyes & Nose -->
+              <ellipse cx="88" cy="110" rx="3" ry="5" fill="#1E293B"/>
+              <ellipse cx="112" cy="110" rx="3" ry="5" fill="#1E293B"/>
+              <polygon points="100,116 97,112 103,112" fill="#F472B6"/>
+              <path d="M 97 120 Q 100 123 103 120" fill="none" stroke="#64748B" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="bg-white text-slate-800 text-xs sm:text-sm font-bold px-4 py-2 rounded-2xl shadow-lg border-2 border-sky-300 mt-2 text-center">
+            <span class="simsun-hanzi text-base font-bold text-sky-800">外面在刮风，小白不见了！</span> 🐱🍃
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Selection Cards Grid -->
+      <div class="grid grid-cols-1 gap-4">
+
+        <!-- Modul 1 Card -->
+        <div onclick="switchTab('modul1')" class="bg-white rounded-3xl p-5 border-4 border-sky-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl font-bold simsun-hanzi">
+              刂
+            </div>
+            <span class="bg-sky-100 text-sky-700 font-bold text-xs px-2.5 py-1 rounded-full">Bagian 1 & 2</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold text-slate-800">Radikal 刂 (立刀旁) & Huruf Mandarin</h3>
+            <p class="text-xs text-slate-500 mt-1">Permainan mencari 6 kata radikal 刂 di tomat & belajar kosakata: 东西, 外面, 开, 刮风, 别/不要.</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-sky-600 pt-3 border-t border-slate-100">
+            <span>Game Radikal & Kartu Kata</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Modul 2 Card -->
+        <div onclick="switchTab('modul2')" class="bg-white rounded-3xl p-5 border-4 border-emerald-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+              ✍️
+            </div>
+            <span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-full">Bagian 3</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold text-slate-800">Isi Kata Kosong (选择词语)</h3>
+            <p class="text-xs text-slate-500 mt-1">Lengkapi kalimat dengan kata yang tepat dari Unit 4: 东西, 外面, 开, 刮风, 别, 找到.</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-emerald-600 pt-3 border-t border-slate-100">
+            <span>5 Soal Isian Kalimat</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Modul 3 Card -->
+        <div onclick="switchTab('modul3')" class="bg-white rounded-3xl p-5 border-4 border-pink-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-2xl font-bold">
+              🛑
+            </div>
+            <span class="bg-pink-100 text-pink-700 font-bold text-xs px-2.5 py-1 rounded-full">Bagian 4</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold text-slate-800">Penggunaan 别 / 不要 (Grammar Larangan)</h3>
+            <p class="text-xs text-slate-500 mt-1">Latihan membuat kalimat larangan "Jangan..." (别 / 不要) sesuai situasi harian (5 Soal).</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-pink-600 pt-3 border-t border-slate-100">
+            <span>Latihan Tata Bahasa</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Modul 4 Card -->
+        <div onclick="switchTab('modul4')" class="bg-white rounded-3xl p-5 border-4 border-purple-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl font-bold">
+              🐱
+            </div>
+            <span class="bg-purple-100 text-purple-700 font-bold text-xs px-2.5 py-1 rounded-full">Bagian 5</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold text-slate-800">Membaca 《小白不见了》 (Xiaobai Hilang)</h3>
+            <p class="text-xs text-slate-500 mt-1">Baca cerita Kakak Xiaoyu mencari kucingnya Xiaobai & jawab 10 soal cerita buku cetak PDF.</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-purple-600 pt-3 border-t border-slate-100">
+            <span>Audio & 10 Soal Cerita</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Modul 5 Card -->
+        <div onclick="switchTab('modul5')" class="bg-white rounded-3xl p-5 border-4 border-orange-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-bold">
+              💬
+            </div>
+            <span class="bg-orange-100 text-orange-700 font-bold text-xs px-2.5 py-1 rounded-full">Bagian 6</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold text-slate-800">Lengkapi Dialog (完成对话)</h3>
+            <p class="text-xs text-slate-500 mt-1">Jodohkan pertanyaan A–E dengan respon percakapan bertema cuaca & pencarian benda.</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold text-orange-600 pt-3 border-t border-slate-100">
+            <span>5 Pasang Dialog</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Sertifikat Card -->
+        <div onclick="switchTab('certificate')" class="bg-gradient-to-br from-yellow-300 to-amber-400 rounded-3xl p-5 border-4 border-yellow-200 shadow-md hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between text-slate-900">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-2xl bg-white/40 flex items-center justify-center text-2xl font-bold">
+              🏆
+            </div>
+            <span class="bg-white/40 font-bold text-xs px-2.5 py-1 rounded-full">LCN Palembang</span>
+          </div>
+          <div class="my-3">
+            <h3 class="font-fredoka text-xl font-bold">Sertifikat Kelulusan Unit 4</h3>
+            <p class="text-xs font-medium opacity-90 mt-1">Cetak sertifikat bintang hasil belajar kamu di bit.ly/lcnpalembang!</p>
+          </div>
+          <div class="flex items-center justify-between text-xs font-bold pt-3 border-t border-black/10">
+            <span>Lihat Sertifikat</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 1. MODUL 1: RADIKAL 刂 & HURUF MANDARIN ==================== -->
+    <section id="tab-modul1" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-4 border-sky-200 shadow-lg space-y-8">
+        
+        <!-- Radical Header & Interactive Tomato Game -->
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-sky-100">
+            <div>
+              <span class="text-xs font-bold text-sky-500 uppercase tracking-wide">1. 部首 (Ayo Belajar Radikal)</span>
+              <h2 class="text-2xl font-bold font-fredoka text-slate-800">
+                Radikal <span class="simsun-hanzi text-sky-600 text-3xl font-bold">刂</span> (立刀旁 - lìdāopáng / Pisau)
+              </h2>
+            </div>
+            <div class="bg-sky-100 text-sky-800 text-xs font-bold px-4 py-2 rounded-2xl flex items-center gap-2">
+              <i class="fa-solid fa-utensils"></i> Temukan 6 gambar buah yang memiliki huruf beradikal 刂!
+            </div>
+          </div>
+
+          <!-- Interactive Tomato Interactive Board -->
+          <div class="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-3xl border-2 border-red-200 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Permainan Tomat Radikal 刂 (6 Target Correct):</span>
+              <span id="tomato-score" class="text-xs font-bold bg-red-500 text-white px-3 py-1 rounded-full">Ditemukan: 0 / 6</span>
+            </div>
+
+            <!-- Tomato Cards Grid -->
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2" id="tomato-game-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Shengzi Flashcard Grid -->
+        <div class="pt-6 border-t border-sky-100">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold font-fredoka text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-book-open text-sky-500"></i>
+              2. 写汉字 (Kosakata Utama Unit 4)
+            </h3>
+            <span class="text-xs text-slate-500">Klik kartu untuk mendengar suara audio Pinyin!</span>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4" id="shengzi-cards-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 2. MODUL 2: ISI KATA ==================== -->
+    <section id="tab-modul2" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-4 border-emerald-200 shadow-lg space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-emerald-100">
+          <div>
+            <span class="text-xs font-bold text-emerald-500 uppercase tracking-wide">3. 选择正确词语填空 (Melengkapi Kalimat)</span>
+            <h2 class="text-2xl font-bold font-fredoka text-slate-800">Pilihlah Kata Unit 4 yang Tepat</h2>
+          </div>
+          <div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-2xl border border-emerald-200">
+            <span class="text-xs font-bold text-emerald-800">5 Soal Isian</span>
+          </div>
+        </div>
+
+        <!-- Word Bank Options Display -->
+        <div class="bg-gradient-to-r from-emerald-100 to-teal-100 p-4 rounded-2xl border-2 border-emerald-300 flex flex-wrap items-center justify-center gap-3 shadow-inner">
+          <span class="text-xs font-bold text-emerald-900 uppercase tracking-wider block w-full text-center">Pilihan Kata (词语库):</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">东西</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">外面</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">开</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">刮风</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">别</span>
+          <span class="simsun-hanzi text-2xl font-bold bg-white text-emerald-900 px-4 py-1.5 rounded-xl shadow-sm border border-emerald-200">找到</span>
+        </div>
+
+        <!-- Questions List -->
+        <div class="space-y-4" id="m2-questions-container">
+          <!-- Rendered via JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 3. MODUL 3: TATA BAHASA 别 / 不要 ==================== -->
+    <section id="tab-modul3" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-4 border-pink-200 shadow-lg space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-pink-100">
+          <div>
+            <span class="text-xs font-bold text-pink-500 uppercase tracking-wide">4. 用“别”或者“不要”完成句子 (Kalimat Larangan)</span>
+            <h2 class="text-2xl font-bold font-fredoka text-slate-800">Selesaikan Kalimat Larangan "Jangan..."</h2>
+          </div>
+          <div class="bg-pink-50 text-pink-700 text-xs font-bold px-3 py-1.5 rounded-2xl border border-pink-200">
+            5 Soal Tata Bahasa
+          </div>
+        </div>
+
+        <!-- Grammar Rules Banner -->
+        <div class="bg-pink-50 p-4 rounded-2xl border-2 border-pink-200 space-y-2">
+          <span class="text-xs font-bold text-pink-600 uppercase">Pola Tata Bahasa: 别 / 不要 + Verb (Jangan ...)</span>
+          <p class="simsun-hanzi text-lg font-bold text-slate-800">外面很冷，<span class="text-pink-600 underline">别 / 不要</span> 出去！</p>
+          <p class="text-xs text-slate-600">Digunakan untuk melarang atau menyarankan seseorang agar tidak melakukan suatu tindakan.</p>
+        </div>
+
+        <!-- Quiz List Grid -->
+        <div class="space-y-4" id="m3-questions-container">
+          <!-- Rendered via JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 4. MODUL 4: CERITA KUCING 《小白不见了》 ==================== -->
+    <section id="tab-modul4" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-4 border-purple-200 shadow-lg space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-purple-100">
+          <div>
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-wide">5. 阅读 (Ayo Membaca Teks Cerita)</span>
+            <h2 class="text-2xl font-bold font-fredoka text-slate-800">《小白不见了》 (Xiaobai Hilang)</h2>
+          </div>
+          <button onclick="speakFullStory()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow flex items-center gap-2 transition">
+            <i class="fa-solid fa-volume-high"></i> Dengarkan Cerita Lengkap
+          </button>
+        </div>
+
+        <!-- Story Display Card -->
+        <div class="bg-gradient-to-br from-purple-50 to-indigo-50/50 rounded-3xl p-6 border-2 border-purple-200 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+              🐱
+            </div>
+            <div>
+              <h3 class="simsun-hanzi text-2xl font-bold text-purple-950">小白不见了</h3>
+              <p class="text-xs font-semibold text-purple-600">Xiaobai Hilang (Kucing Kakak Xiaoyu)</p>
+            </div>
+          </div>
+
+          <!-- Paragraph 1 -->
+          <div class="p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100 hover:border-purple-300 transition group cursor-pointer" onclick="speakText('她叫小玉，是我姐姐。她养了一只猫。这只猫很漂亮，它是一只很胖的白猫。姐姐给它起个名字叫小白。')">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-purple-400">Bagian 1</span>
+              <i class="fa-solid fa-volume-low text-purple-400 group-hover:opacity-100 transition"></i>
+            </div>
+            <p class="simsun-hanzi text-xl font-bold text-slate-900 leading-relaxed">
+              她叫小玉，是我姐姐。她养了一只猫。这只猫很漂亮，它是一只很胖的白猫。姐姐给它起个名字叫小白。
+            </p>
+            <p class="pinyin-text text-sm text-purple-600 mt-1 font-semibold">
+              Tā jiào Xiǎoyù, shì wǒ jiějie. Tā yǎng le yì zhī māo. Zhè zhī māo hěn piàoliang, tā shì yì zhī hěn pàng de bái māo. Jiějie gěi tā qǐ gè míngzi jiào Xiǎobái.
+            </p>
+            <p class="text-xs text-slate-500 mt-1 italic">
+              (Dia bernama Xiaoyu, adalah kakak perempuan saya. Dia memelihara seekor kucing. Kucing ini sangat cantik, ia adalah kucing putih yang sangat gemuk. Kakak memberinya nama Xiaobai.)
+            </p>
+          </div>
+
+          <!-- Paragraph 2 -->
+          <div class="p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100 hover:border-purple-300 transition group cursor-pointer" onclick="speakText('有一天小白不见了，姐姐很着急。姐姐去房间里找，小白不在房间里，她去厨房里找，小白也不在厨房里。小白在哪儿呢？姐姐去我们家旁边的小商店找，但是小白也不在那儿。')">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-purple-400">Bagian 2</span>
+              <i class="fa-solid fa-volume-low text-purple-400 group-hover:opacity-100 transition"></i>
+            </div>
+            <p class="simsun-hanzi text-xl font-bold text-slate-900 leading-relaxed">
+              有一天小白不见了，姐姐很着急。姐姐去房间里找，小白不在房间里，她去厨房里找，小白也不在厨房里。小白在哪儿呢？姐姐去我们家旁边的小商店找，但是小白也不在那儿。
+            </p>
+            <p class="pinyin-text text-sm text-purple-600 mt-1 font-semibold">
+              Yǒu yì tiān Xiǎobái bù jiàn le, jiějie hěn zháojí. Jiějie qù fángjiān lǐ zhǎo, Xiǎobái bú zài fángjiān lǐ, tā qù chúfáng lǐ zhǎo, Xiǎobái yě bú zài chúfáng lǐ. Xiǎobái zài nǎr ne? Jiějie qù wǒmen jiā pángbiān de xiǎo shāngdiàn zhǎo, dànshì Xiǎobái yě bú zài nàr.
+            </p>
+            <p class="text-xs text-slate-500 mt-1 italic">
+              (Suatu hari Xiaobai hilang, kakak sangat cemas. Kakak pergi mencari di dalam kamar, Xiaobai tidak ada di kamar. Dia pergi mencari di dapur, Xiaobai juga tidak ada di dapur. Di mana Xiaobai? Kakak pergi mencari di toko kecil samping rumah kami, tetapi Xiaobai juga tidak ada di sana.)
+            </p>
+          </div>
+
+          <!-- Paragraph 3 -->
+          <div class="p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100 hover:border-purple-300 transition group cursor-pointer" onclick="speakText('商店里的林奶奶问姐姐：“小玉，你找什么？”姐姐说：“我找我的猫小白。”林奶奶听了说：“你的猫是白色的吗？我看见它在张老师家门口睡觉呢。”姐姐听了，跟林奶奶说谢谢，然后走去张老师家找小白。')">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-purple-400">Bagian 3</span>
+              <i class="fa-solid fa-volume-low text-purple-400 group-hover:opacity-100 transition"></i>
+            </div>
+            <p class="simsun-hanzi text-xl font-bold text-slate-900 leading-relaxed">
+              商店里的林奶奶问姐姐：“小玉，你找什么？”姐姐说：“我找我的猫小白。”林奶奶听了说：“你的猫是白色的吗？我看见它在张老师家门口睡觉呢。”姐姐听了，跟林奶奶说谢谢，然后走去张老师家找小白。
+            </p>
+            <p class="pinyin-text text-sm text-purple-600 mt-1 font-semibold">
+              Shāngdiàn lǐ de Lín nǎinai wèn jiějie: “Xiǎoyù, nǐ zhǎo shénme?” Jiějie shuō: “Wǒ zhǎo wǒ de māo Xiǎobái.” Lín nǎinai tīng le shuō: “Nǐ de māo shì báisè de ma? Wǒ kànjiàn tā zài Zhāng lǎoshī jiā ménkǒu shuìjiào ne.” Jiějie tīng le, gēn Lín nǎinai shuō xièxie, ránhòu zǒu qù Zhāng lǎoshī jiā zhǎo Xiǎobái.
+            </p>
+            <p class="text-xs text-slate-500 mt-1 italic">
+              (Nenek Lin di toko bertanya kepada kakak: "Xiaoyu, kamu mencari apa?" Kakak menjawab: "Saya mencari kucing saya Xiaobai." Nenek Lin mendengar dan berkata: "Apakah kucingmu berwarna putih? Saya melihatnya sedang tidur di depan pintu rumah Laoshi Zhang." Kakak mendengarnya, mengucapkan terima kasih kepada Nenek Lin, lalu berjalan ke rumah Laoshi Zhang mencari Xiaobai.)
+            </p>
+          </div>
+
+          <!-- Paragraph 4 -->
+          <div class="p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100 hover:border-purple-300 transition group cursor-pointer" onclick="speakText('她在张老师家门口找到了小白，她很高兴，就把小白带回家了。')">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-purple-400">Bagian 4</span>
+              <i class="fa-solid fa-volume-low text-purple-400 group-hover:opacity-100 transition"></i>
+            </div>
+            <p class="simsun-hanzi text-xl font-bold text-slate-900 leading-relaxed">
+              她在张老师家门口找到了小白，她很高兴，就把小白带回家了。
+            </p>
+            <p class="pinyin-text text-sm text-purple-600 mt-1 font-semibold">
+              Tā zài Zhāng lǎoshī jiā ménkǒu zhǎodào le Xiǎobái, tā hěn gāoxìng, jiù bǎ Xiǎobái dài huí jiā le.
+            </p>
+            <p class="text-xs text-slate-500 mt-1 italic">
+              (Dia menemukan Xiaobai di depan pintu rumah Laoshi Zhang, dia sangat senang, lalu membawa Xiaobai pulang ke rumah.)
+            </p>
+          </div>
+        </div>
+
+        <!-- Questions Section (10 Questions from PDF) -->
+        <div class="pt-4 space-y-4">
+          <h3 class="text-xl font-bold font-fredoka text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-circle-question text-purple-500"></i>
+            根据课文选择正确答案 (Jawablah 10 Soal Bacaan PDF Unit 4)
+          </h3>
+
+          <div class="space-y-4" id="m4-reading-questions">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 5. MODUL 5: LENGKAPI DIALOG ==================== -->
+    <section id="tab-modul5" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-4 border-orange-200 shadow-lg space-y-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-orange-100">
+          <div>
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-wide">6. 选择正确句子完成对话 (Melengkapi Percakapan)</span>
+            <h2 class="text-2xl font-bold font-fredoka text-slate-800">Pasangkan Pertanyaan Dialog yang Tepat</h2>
+          </div>
+          <button onclick="resetDialogueQuiz()" class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1.5 rounded-2xl hover:bg-orange-200 transition">
+            <i class="fa-solid fa-rotate-left"></i> Reset Percakapan
+          </button>
+        </div>
+
+        <!-- Options Choice Bank -->
+        <div class="bg-orange-50 p-4 rounded-2xl border-2 border-orange-200 space-y-2">
+          <span class="text-xs font-bold text-orange-700 uppercase tracking-wider block">Pilihan Kalimat Pertanyaan (A–E):</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs font-bold">
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center gap-2">
+              <span class="bg-orange-500 text-white rounded-lg px-2 py-0.5">A</span>
+              <span class="simsun-hanzi text-base text-slate-800">外面天气怎么样？</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center gap-2">
+              <span class="bg-orange-500 text-white rounded-lg px-2 py-0.5">B</span>
+              <span class="simsun-hanzi text-base text-slate-800">你在去找什么？</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center gap-2">
+              <span class="bg-orange-500 text-white rounded-lg px-2 py-0.5">C</span>
+              <span class="simsun-hanzi text-base text-slate-800">小白在房间里吗？</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center gap-2">
+              <span class="bg-orange-500 text-white rounded-lg px-2 py-0.5">D</span>
+              <span class="simsun-hanzi text-base text-slate-800">我可以开门吗？</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-xl border border-orange-200 flex items-center gap-2">
+              <span class="bg-orange-500 text-white rounded-lg px-2 py-0.5">E</span>
+              <span class="simsun-hanzi text-base text-slate-800">你在哪儿找到书的？</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dialogue Scenarios List -->
+        <div class="space-y-4" id="m5-dialogue-container">
+          <!-- Rendered via JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 6. SERTIFIKAT KELAS ==================== -->
+    <section id="tab-certificate" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border-4 border-yellow-300 shadow-xl max-w-4xl mx-auto">
+        
+        <!-- Top Action Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-yellow-200 no-print">
+          <div>
+            <span class="text-xs font-bold text-amber-500 uppercase tracking-wide">Pencapaian Belajar Mandarin • bit.ly/lcnpalembang</span>
+            <h2 class="text-2xl font-bold font-fredoka text-slate-800">Sertifikat Kelulusan Unit 4</h2>
+          </div>
+          <button onclick="window.print()" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-6 py-2.5 rounded-2xl shadow flex items-center gap-2 transition">
+            <i class="fa-solid fa-print"></i> Cetak Sertifikat Kelas
+          </button>
+        </div>
+
+        <!-- Certificate Modal Body -->
+        <div id="certificate-modal" class="bg-gradient-to-b from-sky-50 via-white to-amber-50 rounded-3xl p-8 border-8 border-sky-300 relative overflow-hidden shadow-inner text-center space-y-6">
+          <div class="border-2 border-dashed border-sky-400 p-6 rounded-2xl space-y-6 relative">
+            
+            <div class="space-y-2">
+              <span class="text-xs font-bold uppercase tracking-widest text-sky-800 block">LCN PALEMBANG • bit.ly/lcnpalembang</span>
+              <h1 class="text-3xl sm:text-4xl font-extrabold font-fredoka text-sky-600">SERTIFIKAT BINTANG MEIHUA 4</h1>
+              <p class="text-xs text-slate-500 uppercase font-bold">UNIT 04 • 外面在刮风呢</p>
+            </div>
+
+            <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full"></div>
+
+            <div class="space-y-1">
+              <p class="text-xs text-slate-500">Sertifikat Penghargaan Diberikan Kepada:</p>
+              <h2 id="cert-student-name" class="text-2xl sm:text-3xl font-extrabold text-sky-900 underline decoration-yellow-400">Siswa LCN Palembang</h2>
+              <p class="text-xs text-slate-600 pt-1">Atas Keberhasilan Merampungkan Latihan Interaktif Unit 4 Mandarin Meihua 4 dengan Sangat Baik!</p>
+            </div>
+
+            <!-- Star Badge -->
+            <div class="bg-yellow-100 border-2 border-yellow-300 rounded-2xl py-4 px-6 inline-block space-y-1">
+              <span class="text-xs font-bold text-amber-800 block uppercase">Total Bintang Dikumpulkan</span>
+              <div class="flex items-center justify-center gap-2">
+                <i class="fa-solid fa-star text-amber-500 text-3xl animate-bounce"></i>
+                <span id="cert-star-total" class="font-fredoka text-4xl font-extrabold text-amber-900">0</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-around pt-6 border-t border-sky-200/80">
+              <div class="text-center space-y-1">
+                <span class="text-xs text-slate-400 block">Tanggal Selesai</span>
+                <span id="cert-date" class="text-xs font-bold text-slate-700">27 Oktober 2026</span>
+              </div>
+
+              <div class="w-16 h-16 text-3xl flex items-center justify-center bg-sky-100 rounded-full border-2 border-sky-300">
+                🍃
+              </div>
+
+              <div class="text-center space-y-1">
+                <span class="text-xs text-slate-400 block">Status / Tautan</span>
+                <span class="text-xs font-bold text-sky-700">bit.ly/lcnpalembang ⭐</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    </div> <!-- End Right Content Area -->
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* Global Application State */
+    const state = {
+      studentName: 'Siswa LCN Palembang',
+      stars: 0,
+      pinyinVisible: true,
+      soundFX: true,
+      classroomMode: false,
+      audioCtx: null,
+
+      m1FoundCount: 0,
+      m2Answers: {},
+      m3Answers: {},
+      m4Answers: {},
+      m5Answers: {}
+    };
+
+    /* Sound Audio Engine */
+    function initAudio() {
+      if (!state.audioCtx) {
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(type) {
+      if (!state.soundFX) return;
+      try {
+        initAudio();
+        const ctx = state.audioCtx;
+        const now = ctx.currentTime;
+
+        if (type === 'click') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.exponentialRampToValueAtTime(900, now + 0.05);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'correct') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.2);
+          });
+        } else if (type === 'wrong') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.setValueAtTime(130, now + 0.15);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'star') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1760, now + 0.15);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        }
+      } catch (e) {
+        console.log("Audio FX exception", e);
+      }
+    }
+
+    function toggleSoundFX() {
+      state.soundFX = !state.soundFX;
+      const icon = document.getElementById('sound-icon');
+      if (state.soundFX) {
+        icon.className = 'fa-solid fa-volume-high';
+        playSound('click');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark';
+      }
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* Confetti Particle Cannon */
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#38BDF8', '#818CF8', '#F472B6', '#34D399', '#FBBF24', '#FB923C'];
+
+      for (let i = 0; i < 90; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 0.5) * 14 - 4,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+
+        particles.forEach(p => {
+          if (p.alpha > 0) {
+            active = true;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.22;
+            p.alpha -= 0.015;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+
+        if (active) requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    /* Core Utility Controls */
+    function addStars(count) {
+      state.stars += count;
+      document.getElementById('star-count').innerText = state.stars;
+      document.getElementById('cert-star-total').innerText = state.stars;
+      playSound('star');
+    }
+
+    function updateStudentName(val) {
+      state.studentName = val || 'Siswa LCN Palembang';
+      document.getElementById('cert-student-name').innerText = state.studentName;
+    }
+
+    function togglePinyinGlobal() {
+      state.pinyinVisible = !state.pinyinVisible;
+      document.getElementById('pinyin-status-text').innerText = state.pinyinVisible ? 'Pinyin: ON' : 'Pinyin: OFF';
+      document.querySelectorAll('.pinyin-text').forEach(el => {
+        if (state.pinyinVisible) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+      playSound('click');
+    }
+
+    function toggleClassroomMode() {
+      state.classroomMode = !state.classroomMode;
+      const body = document.getElementById('app-body');
+      const label = document.getElementById('class-mode-text');
+
+      if (state.classroomMode) {
+        body.classList.add('classroom-large');
+        label.innerText = 'Tampilan Normal';
+      } else {
+        body.classList.remove('classroom-large');
+        label.innerText = 'Tampilan Kelas';
+      }
+      playSound('click');
+    }
+
+    function switchTab(tabId) {
+      playSound('click');
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-sky-500', 'text-white', 'shadow-md');
+        el.classList.add('bg-white', 'text-slate-700');
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.remove('bg-white', 'text-slate-700');
+        activeNav.classList.add('bg-sky-500', 'text-white', 'shadow-md');
+      }
+    }
+
+    /* ================= DATA & RENDERING LOGIC ================= */
+
+    // Section 1: Radical Tomato Game Data (PDF Page 1)
+    const tomatoData = [
+      { id: 1, hanzi: "利", hasRadical: true, pinyin: "lì" },
+      { id: 2, hanzi: "别", hasRadical: true, pinyin: "bié" },
+      { id: 3, hanzi: "害", hasRadical: false, pinyin: "hài" },
+      { id: 4, hanzi: "适", hasRadical: false, pinyin: "shì" },
+      { id: 5, hanzi: "刮", hasRadical: true, pinyin: "guā" },
+      { id: 6, hanzi: "瞎", hasRadical: false, pinyin: "xiā" },
+      { id: 7, hanzi: "倒", hasRadical: false, pinyin: "dǎo" },
+      { id: 8, hanzi: "该", hasRadical: false, pinyin: "gāi" },
+      { id: 9, hanzi: "割", hasRadical: true, pinyin: "gē" },
+      { id: 10, hanzi: "舌", hasRadical: false, pinyin: "shé" },
+      { id: 11, hanzi: "到", hasRadical: true, pinyin: "dào" },
+      { id: 12, hanzi: "例", hasRadical: true, pinyin: "lì" }
+    ];
+
+    function renderTomatoGame() {
+      const container = document.getElementById('tomato-game-grid');
+      container.innerHTML = tomatoData.map(item => `
+        <button onclick="clickTomato(${item.id})" id="tomato-btn-${item.id}"
+                class="bg-white hover:bg-red-50 border-2 border-red-300 rounded-2xl p-3 flex flex-col items-center justify-center transition shadow-sm hover:scale-105 group">
+          <span class="text-2xl mb-1">🍅</span>
+          <span class="simsun-hanzi text-3xl font-bold text-slate-800 group-hover:text-red-600">${item.hanzi}</span>
+          <span class="pinyin-text text-xs text-red-500 font-semibold mt-0.5">${item.pinyin}</span>
+        </button>
+      `).join('');
+    }
+
+    const clickedTomatoes = {};
+    function clickTomato(id) {
+      if (clickedTomatoes[id]) return;
+      const item = tomatoData.find(t => t.id === id);
+      const btn = document.getElementById(`tomato-btn-${id}`);
+
+      speakText(item.hanzi);
+
+      if (item.hasRadical) {
+        clickedTomatoes[id] = true;
+        playSound('correct');
+        btn.className = "bg-red-500 border-2 border-red-600 text-white rounded-2xl p-3 flex flex-col items-center justify-center shadow-md animate-bounce";
+        btn.innerHTML = `<span class="text-2xl mb-1">✅</span><span class="simsun-hanzi text-3xl font-bold text-white">${item.hanzi}</span><span class="text-xs text-white/90 font-bold">Radikal 刂</span>`;
+        state.m1FoundCount++;
+        document.getElementById('tomato-score').innerText = `Ditemukan: ${state.m1FoundCount} / 6`;
+        addStars(5);
+
+        if (state.m1FoundCount === 6) {
+          triggerConfetti();
+        }
+      } else {
+        playSound('wrong');
+        btn.className = "bg-slate-200 border-2 border-slate-400 text-slate-500 rounded-2xl p-3 flex flex-col items-center justify-center shadow-inner opacity-70";
+      }
+    }
+
+    // Section 2: Shengzi Vocab List
+    const shengziData = [
+      { hanzi: "东西", pinyin: "dōngxi", meaning: "Barang / Benda", strokes: "东 (5 guratan) + 西 (6 guratan)" },
+      { hanzi: "外面", pinyin: "wàimian", meaning: "Di Luar", strokes: "外 (5 guratan) + 面 (9 guratan)" },
+      { hanzi: "开", pinyin: "kāi", meaning: "Buka / Membuka", strokes: "开 (4 guratan)" },
+      { hanzi: "刮风", pinyin: "guā fēng", meaning: "Bertiup Angin", strokes: "刮 (8 guratan) + 风 (4 guratan)" },
+      { hanzi: "别 / 不要", pinyin: "bié / búyào", meaning: "Jangan", strokes: "别 (7 guratan)" }
+    ];
+
+    function renderShengziCards() {
+      const container = document.getElementById('shengzi-cards-container');
+      container.innerHTML = shengziData.map(item => `
+        <div onclick="speakText('${item.hanzi}')" 
+             class="bg-gradient-to-br from-white to-sky-50/50 p-5 rounded-3xl border-2 border-sky-200 hover:border-sky-400 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-3 group">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-sky-600 bg-sky-100 px-2.5 py-1 rounded-full">Meihua 4 Vocab</span>
+            <i class="fa-solid fa-volume-high text-sky-500 text-lg group-hover:scale-110 transition"></i>
+          </div>
+          <div class="text-center my-2 space-y-1">
+            <h4 class="simsun-hanzi text-4xl font-bold text-slate-900 group-hover:text-sky-600 transition">${item.hanzi}</h4>
+            <p class="pinyin-text text-base font-bold text-sky-600">${item.pinyin}</p>
+            <p class="text-sm font-semibold text-slate-700">${item.meaning}</p>
+          </div>
+          <div class="text-center pt-2 border-t border-sky-100">
+            <span class="text-xs font-bold text-slate-400">Guratan: ${item.strokes}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Section 3: Fill in Blanks Data (Unit 4 Vocab)
+    const m2QuestionsData = [
+      {
+        id: 1,
+        sentence: "1. 天气很冷，你在 __ 吗？",
+        options: ["外面", "东西", "刮风", "开", "别"],
+        correct: "外面",
+        pinyin: "Tiānqì hěn lěng, nǐ zài wàimian ma?",
+        meaning: "Cuaca sangat dingin, apakah kamu berada di LUAR?"
+      },
+      {
+        id: 2,
+        sentence: "2. 今天外面在 __ ，别出去玩。",
+        options: ["东西", "刮风", "开", "找到", "外面"],
+        correct: "刮风",
+        pinyin: "Jīntiān wàimian zài guā fēng, bié chūqù wán.",
+        meaning: "Hari ini di luar BERANGIN, jangan keluar bermain."
+      },
+      {
+        id: 3,
+        sentence: "3. 请你把门 __ 一下。",
+        options: ["开", "刮风", "东西", "外面", "别"],
+        correct: "开",
+        pinyin: "Qǐng nǐ bǎ mén kāi yíxià.",
+        meaning: "Tolong MUKALAH pintu sebentar."
+      },
+      {
+        id: 4,
+        sentence: "4. 桌子上有很多 __ 。",
+        options: ["刮风", "东西", "开", "找到", "外面"],
+        correct: "东西",
+        pinyin: "Zhuōzi shang yǒu hěn duō dōngxi.",
+        meaning: "Di atas meja ada banyak BARANG."
+      },
+      {
+        id: 5,
+        sentence: "5. 我在张老师家门口 __ 了小白。",
+        options: ["找到", "刮风", "东西", "开", "别"],
+        correct: "找到",
+        pinyin: "Wǒ zài Zhāng lǎoshī jiā ménkǒu zhǎodào le Xiǎobái.",
+        meaning: "Saya MENEMUKAN Xiaobai di depan pintu rumah Laoshi Zhang."
+      }
+    ];
+
+    function renderModul2() {
+      const container = document.getElementById('m2-questions-container');
+      container.innerHTML = m2QuestionsData.map(q => `
+        <div class="bg-emerald-50/60 p-5 rounded-2xl border-2 border-emerald-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-600 bg-white px-2.5 py-1 rounded-full border border-emerald-200">Soal ${q.id}</span>
+            <button onclick="speakText('${q.sentence.replace('__', q.correct)}')" class="text-emerald-600 hover:text-emerald-800 text-xs font-bold flex items-center gap-1">
+              <i class="fa-solid fa-volume-high"></i> Dengarkan
+            </button>
+          </div>
+          <p class="simsun-hanzi text-xl font-bold text-slate-800 leading-relaxed">${q.sentence}</p>
+          <p class="pinyin-text text-xs font-semibold text-emerald-700">${q.pinyin}</p>
+          <p class="text-xs text-slate-500 italic">Arti: "${q.meaning}"</p>
+
+          <div class="flex flex-wrap gap-2 pt-2">
+            ${q.options.map(opt => `
+              <button onclick="answerM2(${q.id}, '${opt}')" id="m2-q${q.id}-opt-${opt}"
+                      class="px-4 py-2 bg-white hover:bg-emerald-100 text-slate-800 simsun-hanzi text-lg font-bold border-2 border-emerald-200 rounded-xl transition shadow-sm">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div id="m2-feedback-${q.id}" class="hidden text-xs font-bold p-3 rounded-xl"></div>
+        </div>
+      `).join('');
+    }
+
+    function answerM2(qId, selectedOpt) {
+      if (state.m2Answers[qId]) return;
+      state.m2Answers[qId] = selectedOpt;
+
+      const q = m2QuestionsData.find(item => item.id === qId);
+      const btn = document.getElementById(`m2-q${qId}-opt-${selectedOpt}`);
+      const feedback = document.getElementById(`m2-feedback-${qId}`);
+      feedback.classList.remove('hidden');
+
+      if (selectedOpt === q.correct) {
+        playSound('correct');
+        addStars(10);
+        btn.className = "px-4 py-2 bg-emerald-500 text-white simsun-hanzi text-lg font-bold border-2 border-emerald-600 rounded-xl shadow-md";
+        feedback.className = "text-xs font-bold p-3 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300";
+        feedback.innerHTML = `✨ BENAR! (+10 Bintang)`;
+        triggerConfetti();
+        speakText(q.sentence.replace('__', q.correct));
+      } else {
+        playSound('wrong');
+        btn.className = "px-4 py-2 bg-rose-500 text-white simsun-hanzi text-lg font-bold border-2 border-rose-600 rounded-xl shadow-md";
+        const correctBtn = document.getElementById(`m2-q${qId}-opt-${q.correct}`);
+        correctBtn.className = "px-4 py-2 bg-emerald-500 text-white simsun-hanzi text-lg font-bold border-2 border-emerald-600 rounded-xl shadow-md";
+        feedback.className = "text-xs font-bold p-3 rounded-xl bg-rose-100 text-rose-800 border border-rose-300";
+        feedback.innerHTML = `❌ KURANG TEPAT! Jawaban yang benar adalah: ${q.correct}`;
+      }
+    }
+
+    // Section 4: Grammar Module 别 / 不要 (PDF Page 3)
+    const m3QuestionsData = [
+      {
+        id: 1,
+        situation: "1. 我今天很忙，...",
+        options: ["别打扰我 (Jangan ganggu saya)", "要吃汉堡包 (Mau makan burger)", "你去学校吧 (Pergilah ke sekolah)"],
+        correct: 0,
+        pinyin: "Wǒ jīntiān hěn máng, bié dǎrǎo wǒ."
+      },
+      {
+        id: 2,
+        situation: "2. 外面很冷，...",
+        options: ["要买苹果 (Mau beli apel)", "别出去 (Jangan keluar)", "去游泳吧 (Mari pergi berenang)"],
+        correct: 1,
+        pinyin: "Wàimian hěn lěng, bié chūqù."
+      },
+      {
+        id: 3,
+        situation: "3. 现在晚上十点了，...",
+        options: ["不要看电视了 (Jangan menonton TV lagi)", "别去睡觉 (Jangan tidur)", "开门吧 (Buka pintu)"],
+        correct: 0,
+        pinyin: "Xiànzài wǎnshang shí diǎn le, búyào kàn diànshì le."
+      },
+      {
+        id: 4,
+        situation: "4. 天气很热，...",
+        options: ["别喝水 (Jangan minum air)", "不要在太阳下跑步 (Jangan berlari di bawah terik matahari)", "穿毛衣吧 (Pakailah sweater)"],
+        correct: 1,
+        pinyin: "Tiānqì hěn rè, búyào zài tàiyáng xià pǎobù."
+      },
+      {
+        id: 5,
+        situation: "5. 你病了，...",
+        options: ["别喝冰水 (Jangan minum air es)", "不要去医院 (Jangan ke RS)", "去冰淇淋吧 (Makan es krim)"],
+        correct: 0,
+        pinyin: "Nǐ bìng le, bié hē bīngshuǐ."
+      }
+    ];
+
+    function renderModul3() {
+      const container = document.getElementById('m3-questions-container');
+      container.innerHTML = m3QuestionsData.map(item => `
+        <div class="bg-pink-50/60 p-5 rounded-2xl border-2 border-pink-100 space-y-3">
+          <p class="simsun-hanzi text-xl font-bold text-slate-800">${item.situation}</p>
+          <p class="pinyin-text text-xs text-pink-700 font-semibold">${item.pinyin}</p>
+          <div class="grid grid-cols-1 gap-2 pt-2">
+            ${item.options.map((opt, idx) => `
+              <button onclick="answerM3(${item.id}, ${idx})" id="m3-q${item.id}-opt-${idx}"
+                      class="text-left p-3 rounded-xl bg-white border border-pink-200 hover:bg-pink-100 font-bold text-xs text-slate-800 transition">
+                <span class="simsun-hanzi text-base">${opt}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function answerM3(qId, selectedIdx) {
+      if (state.m3Answers[qId]) return;
+      state.m3Answers[qId] = true;
+
+      const item = m3QuestionsData.find(d => d.id === qId);
+      const btn = document.getElementById(`m3-q${qId}-opt-${selectedIdx}`);
+
+      if (selectedIdx === item.correct) {
+        playSound('correct');
+        addStars(10);
+        btn.className = "text-left p-3 rounded-xl bg-emerald-500 text-white font-bold text-xs transition shadow-md";
+        speakText(item.situation + item.options[item.correct]);
+        triggerConfetti();
+      } else {
+        playSound('wrong');
+        btn.className = "text-left p-3 rounded-xl bg-rose-500 text-white font-bold text-xs transition shadow-md";
+        const correctBtn = document.getElementById(`m3-q${qId}-opt-${item.correct}`);
+        correctBtn.className = "text-left p-3 rounded-xl bg-emerald-500 text-white font-bold text-xs transition shadow-md";
+      }
+    }
+
+    // Section 5: Reading Comprehension 10 Questions (PDF Page 4 & 5)
+    const m4QuestionsData = [
+      {
+        id: 1,
+        question: "1. 我姐姐叫什么名字？ (Siapakah nama kakak perempuan saya?)",
+        options: ["a. 小白 (Xiaobai)", "b. 小玉 (Xiaoyu)", "c. 小林 (Xiaolin)"],
+        correct: 1,
+        explanation: "Dalam cerita: “她叫小玉，是我姐姐。”"
+      },
+      {
+        id: 2,
+        question: "2. 姐姐的猫怎么样？ (Bagaimana keadaan kucing kakak?)",
+        options: ["a. 很漂亮，很胖，是白色的", "b. 很漂亮，很瘦，是白色的", "c. 很漂亮，很胖，是黑色的"],
+        correct: 0,
+        explanation: "Dalam cerita: “这只猫很漂亮，它是一只很胖的白猫。”"
+      },
+      {
+        id: 3,
+        question: "3. 姐姐的猫叫什么名字？ (Siapa nama kucing kakak?)",
+        options: ["a. 小白 (Xiaobai)", "b. 小玉 (Xiaoyu)", "c. 小林 (Xiaolin)"],
+        correct: 0,
+        explanation: "Dalam cerita: “姐姐给它起个名字叫小白。”"
+      },
+      {
+        id: 4,
+        question: "4. 姐姐为什么很着急？ (Mengapa kakak sangat cemas?)",
+        options: ["a. 小白生病了 (Xiaobai sakit)", "b. 林奶奶生病了 (Nenek Lin sakit)", "c. 小白不见了 (Xiaobai hilang)"],
+        correct: 2,
+        explanation: "Dalam cerita: “有一天小白不见了，姐姐很着急。”"
+      },
+      {
+        id: 5,
+        question: "5. 姐姐在家里都去哪儿找小白？ (Di mana saja kakak mencari Xiaobai di dalam rumah?)",
+        options: ["a. 房间里和厨房里 (Dalam kamar & dalam dapur)", "b. 房间里和书房里 (Dalam kamar & ruang belajar)", "c. 书房里和厨房里 (Ruang belajar & dapur)"],
+        correct: 0,
+        explanation: "Dalam cerita: “姐姐去房间里找... 她去厨房里找...”"
+      },
+      {
+        id: 6,
+        question: "6. 姐姐去的小商店在哪儿？ (Di mana toko kecil yang didatangi kakak?)",
+        options: ["a. 在学校旁边 (Di samping sekolah)", "b. 在我们家旁边 (Di samping rumah kami)", "c. 在医院旁边 (Di samping rumah sakit)"],
+        correct: 1,
+        explanation: "Dalam cerita: “姐姐去我们家旁边的小商店找”"
+      },
+      {
+        id: 7,
+        question: "7. 商店里有谁？ (Ada siapa di toko?)",
+        options: ["a. 小白 (Xiaobai)", "b. 张老师 (Laoshi Zhang)", "c. 林奶奶 (Nenek Lin)"],
+        correct: 2,
+        explanation: "Dalam cerita: “商店里的林奶奶问姐姐...”"
+      },
+      {
+        id: 8,
+        question: "8. 林奶奶告诉姐姐什么？ (Apa yang diberitahukan Nenek Lin kepada kakak?)",
+        options: ["a. 她看见小白在张老师家门口睡觉 (Melihat Xiaobai tidur di pintu rumah Laoshi Zhang)", "b. 她看见小白在她家门口睡觉 (Melihat Xiaobai di depan pintu rumahnya)", "c. 她没有看见小白 (Tidak melihat Xiaobai)"],
+        correct: 0,
+        explanation: "Nenek Lin berkata: “我看见它在张老师家门口睡觉呢。”"
+      },
+      {
+        id: 9,
+        question: "9. 姐姐在哪儿找到小白？ (Di mana kakak menemukan Xiaobai?)",
+        options: ["a. 小商店里 (Di toko kecil)", "b. 林奶奶的家 (Rumah Nenek Lin)", "c. 张老师家门口 (Di depan pintu rumah Laoshi Zhang)"],
+        correct: 2,
+        explanation: "Dalam cerita: “她在张老师家门口找到了小白”"
+      },
+      {
+        id: 10,
+        question: "10. “她在张老师家门口找到了小白。” Kata 找到 (zhǎodào) artinya...",
+        options: ["a. mencari", "b. menemukan", "c. bertemu"],
+        correct: 1,
+        explanation: "找到 (zhǎodào) berarti berhasil menemukan."
+      }
+    ];
+
+    function renderModul4Questions() {
+      const container = document.getElementById('m4-reading-questions');
+      container.innerHTML = m4QuestionsData.map(q => `
+        <div class="bg-purple-50/60 p-5 rounded-2xl border-2 border-purple-100 space-y-3">
+          <p class="font-bold text-slate-800 text-base">${q.question}</p>
+          <div class="grid grid-cols-1 gap-2.5">
+            ${q.options.map((opt, idx) => `
+              <button onclick="answerM4(${q.id}, ${idx})" id="m4-q${q.id}-opt-${idx}"
+                      class="px-4 py-2.5 rounded-xl font-bold text-xs text-left bg-white border-2 border-purple-200 text-purple-900 hover:bg-purple-100 transition shadow-sm">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div id="m4-exp-${q.id}" class="hidden text-xs font-semibold rounded-xl p-3"></div>
+        </div>
+      `).join('');
+    }
+
+    function answerM4(qId, optIdx) {
+      if (state.m4Answers[qId]) return;
+      state.m4Answers[qId] = true;
+
+      const q = m4QuestionsData.find(item => item.id === qId);
+      const expDiv = document.getElementById(`m4-exp-${qId}`);
+      expDiv.classList.remove('hidden');
+
+      if (optIdx === q.correct) {
+        playSound('correct');
+        addStars(10);
+        document.getElementById(`m4-q${qId}-opt-${optIdx}`).className = "px-4 py-2.5 rounded-xl font-bold text-xs text-left bg-emerald-500 text-white border-2 border-emerald-600 shadow-md";
+        expDiv.className = "text-xs font-bold rounded-xl p-3 bg-emerald-100 text-emerald-800 border border-emerald-300";
+        expDiv.innerHTML = `✨ BENAR! (+10 Bintang) <br><span class="font-normal">${q.explanation}</span>`;
+        triggerConfetti();
+      } else {
+        playSound('wrong');
+        document.getElementById(`m4-q${qId}-opt-${optIdx}`).className = "px-4 py-2.5 rounded-xl font-bold text-xs text-left bg-rose-500 text-white border-2 border-rose-600 shadow-md";
+        document.getElementById(`m4-q${qId}-opt-${q.correct}`).className = "px-4 py-2.5 rounded-xl font-bold text-xs text-left bg-emerald-500 text-white border-2 border-emerald-600 shadow-md";
+        expDiv.className = "text-xs font-bold rounded-xl p-3 bg-rose-100 text-rose-800 border border-rose-300";
+        expDiv.innerHTML = `❌ KURANG TEPAT! <br><span class="font-normal">${q.explanation}</span>`;
+      }
+    }
+
+    function speakFullStory() {
+      speakText("她叫小玉，是我姐姐。她养了一只猫。这只猫很漂亮，它是一只很胖的白猫。姐姐给它起个名字叫小白。有一天小白不见了，姐姐很着急。姐姐去房间里找，小白不在房间里，她去厨房里找，小白也不在厨房里。小白在哪儿呢？姐姐去我们家旁边的小商店找，但是小白也不在那儿。商店里的林奶奶问姐姐：“小玉，你找什么？”姐姐说：“我找我的猫小白。”林奶奶听了说：“你的猫是白色的吗？我看见它在张老师家门口睡觉呢。”姐姐听了，跟林奶奶说谢谢，然后走去张老师家找小白。她在张老师家门口找到了小白，她很高兴，就把小白带回家了。");
+    }
+
+    // Section 6: Dialogue Completion Questions
+    const m5DialogueData = [
+      {
+        id: 1,
+        response: "女: 外面在刮风呢，很冷。(Di luar sedang berangin, sangat dingin.)",
+        correctCode: "A",
+        correctText: "A. 外面天气怎么样？ (Bagaimana cuaca di luar?)"
+      },
+      {
+        id: 2,
+        response: "女: 我在找我的猫小白。(Saya sedang mencari kucing saya Xiaobai.)",
+        correctCode: "B",
+        correctText: "B. 你在去找什么？ (Kamu sedang mencari apa?)"
+      },
+      {
+        id: 3,
+        response: "女: 不在，厨房里也没有。(Tidak ada, di dapur juga tidak ada.)",
+        correctCode: "C",
+        correctText: "C. 小白在房间里吗？ (Apakah Xiaobai ada di kamar?)"
+      },
+      {
+        id: 4,
+        response: "女: 外面很冷，别开门！(Di luar sangat dingin, jangan buka pintu!)",
+        correctCode: "D",
+        correctText: "D. 我可以开门吗？ (Bolehkah saya membuka pintu?)"
+      },
+      {
+        id: 5,
+        response: "女: 我在张老师家门口找到的。(Saya menemukannya di depan pintu rumah Laoshi Zhang.)",
+        correctCode: "E",
+        correctText: "E. 你在哪儿找到书的？ (Di mana kamu menemukan bukunya?)"
+      }
+    ];
+
+    const m5Options = ["A", "B", "C", "D", "E"];
+
+    function renderModul5Dialogues() {
+      const container = document.getElementById('m5-dialogue-container');
+      container.innerHTML = m5DialogueData.map(d => `
+        <div class="bg-orange-50/60 p-5 rounded-2xl border-2 border-orange-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-orange-600 bg-white px-2.5 py-1 rounded-full border border-orange-200">Dialog ${d.id}</span>
+            <button onclick="speakText('${d.response}')" class="text-orange-600 hover:text-orange-800 text-xs font-bold"><i class="fa-solid fa-volume-high"></i></button>
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-orange-200 space-y-1">
+            <p class="text-xs text-slate-400 font-bold">Respon Jawaban Anak Perempuan:</p>
+            <p class="simsun-hanzi text-xl font-bold text-slate-900">${d.response}</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-bold text-slate-500 mb-2">Pilih Pertanyaan yang Tepat (A–E):</p>
+            <div class="flex flex-wrap gap-2">
+              ${m5Options.map(opt => `
+                <button onclick="answerM5(${d.id}, '${opt}')" id="m5-q${d.id}-opt-${opt}"
+                        class="w-10 h-10 rounded-xl font-bold text-sm bg-white border-2 border-orange-300 text-orange-900 hover:bg-orange-100 transition shadow-sm">
+                  ${opt}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          <div id="m5-feedback-${d.id}" class="hidden text-xs font-bold p-3 rounded-xl"></div>
+        </div>
+      `).join('');
+    }
+
+    function answerM5(dId, selectedCode) {
+      if (state.m5Answers[dId]) return;
+      state.m5Answers[dId] = selectedCode;
+
+      const d = m5DialogueData.find(item => item.id === dId);
+      const btn = document.getElementById(`m5-q${dId}-opt-${selectedCode}`);
+      const feedback = document.getElementById(`m5-feedback-${dId}`);
+      feedback.classList.remove('hidden');
+
+      if (selectedCode === d.correctCode) {
+        playSound('correct');
+        addStars(10);
+        btn.className = "w-10 h-10 rounded-xl font-bold text-sm bg-emerald-500 text-white border-2 border-emerald-600 shadow-md";
+        feedback.className = "text-xs font-bold p-3 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300";
+        feedback.innerHTML = `✨ TEPAT! Pertanyaan: ${d.correctText}`;
+        triggerConfetti();
+      } else {
+        playSound('wrong');
+        btn.className = "w-10 h-10 rounded-xl font-bold text-sm bg-rose-500 text-white border-2 border-rose-600 shadow-md";
+        const correctBtn = document.getElementById(`m5-q${dId}-opt-${d.correctCode}`);
+        correctBtn.className = "w-10 h-10 rounded-xl font-bold text-sm bg-emerald-500 text-white border-2 border-emerald-600 shadow-md";
+        feedback.className = "text-xs font-bold p-3 rounded-xl bg-rose-100 text-rose-800 border border-rose-300";
+        feedback.innerHTML = `❌ KURANG TEPAT! Jawaban benar: ${d.correctText}`;
+      }
+    }
+
+    function resetDialogueQuiz() {
+      playSound('click');
+      state.m5Answers = {};
+      renderModul5Dialogues();
+    }
+
+    /* Initialize Application on Window Load */
+    window.onload = function() {
+      renderTomatoGame();
+      renderShengziCards();
+      renderModul2();
+      renderModul3();
+      renderModul4Questions();
+      renderModul5Dialogues();
+
+      // Set Certificate Date
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('cert-date').innerText = today.toLocaleDateString('id-ID', options);
+    };
+  </script>
+</body>
+</html>
